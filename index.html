@@ -1,1 +1,996 @@
-<h1>Funciona</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reporte de avance RIS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Chart.js para radar -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: #1f2933;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    h1 {
+      font-size: 19px;
+      color: #1b5e20;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .top-box {
+      border-left: 6px solid #2f80b7;
+      background: #eef8f7;
+      padding: 14px;
+      margin-bottom: 22px;
+    }
+
+    .top-title {
+      color: #2f80b7;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .top-ris {
+      font-size: 14px;
+      margin-top: 5px;
+      font-weight: bold;
+    }
+
+    .controls {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    select,
+    button {
+      padding: 9px 12px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 14px;
+    }
+
+    button {
+      background: #16803c;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0f5f2b;
+    }
+
+    .label {
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .progress-wrap {
+      background: #e5e7eb;
+      border-radius: 6px;
+      height: 34px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      height: 34px;
+      background: #2f89bd;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: width 0.4s ease;
+      min-width: 42px;
+    }
+
+    .summary {
+      border: 1px solid #009b77;
+      background: #eaf8f0;
+      color: #075e36;
+      padding: 11px;
+      border-radius: 5px;
+      margin-bottom: 18px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .section-card {
+      padding: 12px;
+      margin-bottom: 12px;
+      border-left: 5px solid #009b77;
+      background: #eaf8f0;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .section-warning {
+      border-left-color: #c9a227;
+      background: #fff8d9;
+      color: #6b5400;
+    }
+
+    .section-danger {
+      border-left-color: #d93025;
+      background: #fdecea;
+      color: #8a1c14;
+    }
+
+    .section-title {
+      font-weight: bold;
+    }
+
+    .section-meta {
+      margin-top: 4px;
+      font-weight: bold;
+    }
+
+    .mini-bar-wrap {
+      background: rgba(0,0,0,0.08);
+      height: 9px;
+      border-radius: 5px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .mini-bar {
+      height: 9px;
+      border-radius: 5px;
+    }
+
+    .mini-optimo {
+      background: #009b77;
+    }
+
+    .mini-proceso {
+      background: #c9a227;
+    }
+
+    .mini-bajo {
+      background: #d93025;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .kpi {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .kpi-title {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .kpi-value {
+      margin-top: 6px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #0b5394;
+    }
+
+    .error {
+      display: none;
+      background: #fdecea;
+      border-left: 5px solid #d93025;
+      color: #8a1c14;
+      padding: 12px;
+      margin-bottom: 14px;
+      border-radius: 4px;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 20px;
+    }
+
+    .table-box {
+      margin-top: 24px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 7px;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+    }
+
+    /* RADAR */
+    .radar-box {
+      margin-top: 24px;
+      margin-bottom: 20px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .radar-box h2,
+    .detalle-box h2 {
+      margin-top: 0;
+      font-size: 17px;
+      color: #263238;
+    }
+
+    .radar-wrap {
+      position: relative;
+      height: 430px;
+      width: 100%;
+    }
+
+    /* DETALLE DE PREGUNTAS */
+    .detalle-box {
+      margin-top: 16px;
+      margin-bottom: 24px;
+      background: #f8fafc;
+      border: 1px solid #dbe4ea;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .detalle-section-title {
+      font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 10px;
+      color: #0b5394;
+      line-height: 1.4;
+    }
+
+    .pregunta-card {
+      background: white;
+      border-left: 5px solid #94a3b8;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .pregunta-cumple {
+      border-left-color: #009b77;
+    }
+
+    .pregunta-proceso {
+      border-left-color: #c9a227;
+    }
+
+    .pregunta-bajo {
+      border-left-color: #d93025;
+    }
+
+    .pregunta-codigo {
+      font-weight: bold;
+      color: #334155;
+    }
+
+    .pregunta-texto {
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    .pregunta-respuesta {
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    .legend-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      color: #475569;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-green { background: #009b77; }
+    .dot-yellow { background: #c9a227; }
+    .dot-red { background: #d93025; }
+  </style>
+</head>
+
+<body>
+<div class="page">
+
+  <h1>Reporte de avance final</h1>
+
+  <div id="errorBox" class="error"></div>
+
+  <div class="controls">
+    <label>
+      Registro/RIS:
+      <select id="registroSelect"></select>
+    </label>
+
+    <button onclick="renderReporte()">Actualizar reporte</button>
+  </div>
+
+  <div class="top-box">
+    <div class="top-title">Reporte de avance</div>
+    <div class="top-ris">RIS: <span id="nombreRis">-</span></div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-title">Puntaje obtenido</div>
+      <div id="kpiPuntaje" class="kpi-value">0/90</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-title">Preguntas evaluadas</div>
+      <div id="kpiPreguntas" class="kpi-value">45</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-title">Estado final</div>
+      <div id="kpiEstado" class="kpi-value">-</div>
+    </div>
+  </div>
+
+  <div class="label">Porcentaje de cumplimiento:</div>
+
+  <div class="progress-wrap">
+    <div id="barraGeneral" class="progress-bar" style="width:0%;">0%</div>
+  </div>
+
+  <div id="resumenGeneral" class="summary">
+    Cargando reporte...
+  </div>
+
+  <!-- RADAR POR LINEAMIENTO -->
+  <div class="radar-box">
+    <h2>Radar de cumplimiento por lineamiento</h2>
+
+    <div class="legend-inline">
+      <div class="legend-item"><span class="dot dot-green"></span> Óptimo &gt; 75%</div>
+      <div class="legend-item"><span class="dot dot-yellow"></span> En proceso &gt; 30% y ≤ 75%</div>
+      <div class="legend-item"><span class="dot dot-red"></span> Bajo ≤ 30%</div>
+    </div>
+
+    <div class="radar-wrap">
+      <canvas id="radarLineamientos"></canvas>
+    </div>
+  </div>
+
+  <!-- DETALLE AL HACER CLIC EN EL RADAR -->
+  <div id="detallePreguntas" class="detalle-box">
+    <h2>Preguntas del lineamiento seleccionado</h2>
+    <div id="detalleContenido">
+      Haz clic en un punto del radar para ver las preguntas de ese lineamiento.
+    </div>
+  </div>
+
+  <!-- TARJETAS POR SECCIÓN -->
+  <div id="secciones"></div>
+
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr>
+          <th>Sección</th>
+          <th>Puntaje</th>
+          <th>Máximo</th>
+          <th>%</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody id="tablaResumen"></tbody>
+    </table>
+  </div>
+
+  <div id="estadoCarga" class="status"></div>
+
+</div>
+
+<script>
+  // =============================
+  // URLS BASE
+  // =============================
+
+  const RESPUESTAS_LAYER =
+    "https://geominsa.minsa.gob.pe/geominsaserver/rest/services/Hosted/service_baf0c1e7a6874c5384325fa606a88ed0/FeatureServer/0";
+
+  const PREGUNTAS_LAYER =
+    "https://geominsa.minsa.gob.pe/geominsaserver/rest/services/Hosted/INIC_TAB_gdb/FeatureServer/2";
+
+  const RIS_LAYER =
+    "https://geominsa.minsa.gob.pe/geominsaserver/rest/services/Hosted/INIC_TAB_gdb/FeatureServer/1";
+
+  let RIS_FIELD = "ris";
+
+  let respuestas = [];
+  let preguntas = [];
+  let risCatalogo = [];
+  let campoRISDetectado = null;
+
+  let radarLineamientosChart = null;
+  let resultadoActual = null;
+
+  iniciar();
+
+  async function iniciar() {
+    try {
+      limpiarError();
+      setEstado("Cargando datos desde ArcGIS Enterprise...");
+
+      preguntas = await consultarTodo(PREGUNTAS_LAYER);
+      risCatalogo = await consultarTodo(RIS_LAYER);
+      respuestas = await consultarTodo(RESPUESTAS_LAYER);
+
+      prepararPreguntas();
+      prepararRIS();
+
+      campoRISDetectado = detectarCampoRIS(respuestas);
+
+      if (campoRISDetectado) {
+        RIS_FIELD = campoRISDetectado;
+      }
+
+      llenarSelectorRegistros();
+      renderReporte();
+
+      setEstado("Datos cargados correctamente.");
+    } catch (error) {
+      console.error(error);
+      mostrarError(
+        "No se pudo cargar el dashboard. Posibles causas: servicio privado, token requerido, bloqueo CORS o restricción de red. Detalle: " +
+        error.message
+      );
+      setEstado("Error al cargar datos.");
+    }
+  }
+
+  async function consultarTodo(layerUrl) {
+    const pageSize = 2000;
+    let offset = 0;
+    let todos = [];
+
+    while (true) {
+      const queryUrl =
+        layerUrl +
+        "/query?where=1%3D1" +
+        "&outFields=*" +
+        "&returnGeometry=false" +
+        "&f=json" +
+        "&resultOffset=" + offset +
+        "&resultRecordCount=" + pageSize;
+
+      const res = await fetch(queryUrl);
+
+      if (!res.ok) {
+        throw new Error("Error HTTP " + res.status + " en " + layerUrl);
+      }
+
+      const json = await res.json();
+
+      if (json.error) {
+        throw new Error(json.error.message || "Error devuelto por ArcGIS.");
+      }
+
+      const features = json.features || [];
+      todos = todos.concat(features.map(f => f.attributes || {}));
+
+      if (features.length < pageSize) {
+        break;
+      }
+
+      offset += pageSize;
+    }
+
+    return todos;
+  }
+
+  function prepararPreguntas() {
+    preguntas = preguntas
+      .filter(p => p.name && p.seccion && p.label2_nomsec)
+      .map(p => ({
+        name: String(p.name).trim(),
+        labelPregunta: String(p.label1_preg || "").trim(),
+        seccion: String(p.seccion).trim(),
+        nombreSeccion: String(p.label2_nomsec || p.seccion).trim()
+      }))
+      .sort((a, b) => numeroPregunta(a.name) - numeroPregunta(b.name));
+  }
+
+  function numeroPregunta(name) {
+    const n = String(name).replace(/\D/g, "");
+    return Number(n || 0);
+  }
+
+  function prepararRIS() {
+    risCatalogo = risCatalogo
+      .filter(r => r.ris !== undefined && r.label !== undefined)
+      .map(r => ({
+        ris: String(r.ris).trim(),
+        label: String(r.label).trim()
+      }));
+  }
+
+  function detectarCampoRIS(data) {
+    if (!data || data.length === 0) return null;
+
+    const campos = Object.keys(data[0]);
+    const candidatos = ["ris", "RIS", "cod_ris", "codigo_ris", "id_ris", "num_ris"];
+
+    for (const c of candidatos) {
+      if (campos.includes(c)) return c;
+    }
+
+    const aproximado = campos.find(c => c.toLowerCase().includes("ris"));
+    return aproximado || null;
+  }
+
+  function llenarSelectorRegistros() {
+    const select = document.getElementById("registroSelect");
+    select.innerHTML = "";
+
+    if (!respuestas.length) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "No hay registros en la capa de respuestas";
+      select.appendChild(opt);
+      return;
+    }
+
+    respuestas.forEach((fila, index) => {
+      const codigoRIS = fila[RIS_FIELD];
+      const nombreRIS = obtenerNombreRIS(codigoRIS);
+      const oid = fila.OBJECTID || fila.objectid || fila.ObjectId || index + 1;
+
+      const opt = document.createElement("option");
+      opt.value = index;
+      opt.textContent =
+        "Registro " + oid + " | RIS " + (codigoRIS || "-") + " - " + nombreRIS;
+
+      select.appendChild(opt);
+    });
+  }
+
+  function obtenerNombreRIS(codigo) {
+    if (codigo === null || codigo === undefined || codigo === "") return "Sin RIS";
+
+    const item = risCatalogo.find(r => String(r.ris) === String(codigo).trim());
+
+    return item ? item.label : "RIS " + codigo;
+  }
+
+  function renderReporte() {
+    limpiarError();
+
+    const select = document.getElementById("registroSelect");
+    const index = Number(select.value);
+
+    if (isNaN(index) || !respuestas[index]) {
+      mostrarError("No se encontró el registro seleccionado.");
+      return;
+    }
+
+    const fila = respuestas[index];
+    const codigoRIS = fila[RIS_FIELD];
+    const nombreRIS = obtenerNombreRIS(codigoRIS);
+
+    document.getElementById("nombreRis").textContent = nombreRIS;
+
+    const resultado = calcularResultado(fila);
+    resultadoActual = resultado;
+
+    pintarGeneral(resultado);
+    pintarRadarLineamientos(resultado.secciones);
+    pintarSecciones(resultado.secciones);
+    pintarTabla(resultado.secciones);
+
+    if (resultado.secciones.length > 0) {
+      mostrarPreguntasLineamiento(resultado.secciones[0].seccion);
+    }
+
+    setEstado("Reporte generado para " + nombreRIS + ".");
+  }
+
+  function calcularResultado(fila) {
+    const grupos = {};
+
+    preguntas.forEach(p => {
+      if (!grupos[p.seccion]) {
+        grupos[p.seccion] = {
+          seccion: p.seccion,
+          nombreSeccion: p.nombreSeccion,
+          puntaje: 0,
+          maximo: 0,
+          preguntas: 0,
+          detalles: []
+        };
+      }
+
+      const respuesta = fila[p.name];
+      const puntos = puntosPorRespuesta(respuesta);
+
+      grupos[p.seccion].puntaje += puntos;
+      grupos[p.seccion].maximo += 2;
+      grupos[p.seccion].preguntas += 1;
+
+      grupos[p.seccion].detalles.push({
+        codigo: p.name,
+        pregunta: p.labelPregunta,
+        respuesta: respuesta,
+        puntos: puntos,
+        maximo: 2,
+        estado: estadoPregunta(puntos)
+      });
+    });
+
+    const secciones = Object.values(grupos).map(s => {
+      const porcentaje = s.maximo > 0 ? (s.puntaje / s.maximo) * 100 : 0;
+
+      return {
+        ...s,
+        porcentaje,
+        estado: clasificar(porcentaje)
+      };
+    });
+
+    const puntajeTotal = secciones.reduce((acc, s) => acc + s.puntaje, 0);
+    const maximoTotal = secciones.reduce((acc, s) => acc + s.maximo, 0);
+    const porcentajeTotal = maximoTotal > 0 ? (puntajeTotal / maximoTotal) * 100 : 0;
+
+    return {
+      puntajeTotal,
+      maximoTotal,
+      porcentajeTotal,
+      estadoTotal: clasificar(porcentajeTotal),
+      secciones
+    };
+  }
+
+  function puntosPorRespuesta(valor) {
+    if (valor === null || valor === undefined || valor === "") return 0;
+
+    const vOriginal = String(valor).trim();
+    const v = quitarAcentos(vOriginal.toLowerCase());
+
+    if (v === "2") return 2;
+    if (v === "1") return 1;
+    if (v === "0") return 0;
+
+    if (v.includes("no cumple")) return 0;
+    if (v.includes("en proceso")) return 1;
+    if (v.includes("cumple")) return 2;
+
+    if (v === "si" || v === "sí" || v === "yes") return 2;
+    if (v === "parcial") return 1;
+    if (v === "no") return 0;
+
+    return 0;
+  }
+
+  function estadoPregunta(puntos) {
+    if (puntos === 2) return "CUMPLE";
+    if (puntos === 1) return "EN PROCESO";
+    return "NO CUMPLE";
+  }
+
+  // REGLA ACTUALIZADA:
+  // <= 30% = BAJO
+  // > 30% y <= 75% = EN PROCESO
+  // > 75% = ÓPTIMO
+  function clasificar(porcentaje) {
+    if (porcentaje <= 30) return "BAJO";
+    if (porcentaje <= 75) return "EN PROCESO";
+    return "ÓPTIMO";
+  }
+
+  function pintarGeneral(resultado) {
+    const pct = redondear(resultado.porcentajeTotal);
+
+    const barra = document.getElementById("barraGeneral");
+    barra.style.width = Math.max(4, Math.min(pct, 100)) + "%";
+    barra.textContent = pct + "%";
+
+    document.getElementById("resumenGeneral").textContent =
+      "Avance final obtenido: " + pct + "% - " +
+      resultado.estadoTotal +
+      " (puntaje " + resultado.puntajeTotal + "/" + resultado.maximoTotal + ")";
+
+    document.getElementById("kpiPuntaje").textContent =
+      resultado.puntajeTotal + "/" + resultado.maximoTotal;
+
+    document.getElementById("kpiPreguntas").textContent =
+      preguntas.length;
+
+    document.getElementById("kpiEstado").textContent =
+      resultado.estadoTotal;
+  }
+
+  function pintarRadarLineamientos(secciones) {
+    const labels = secciones.map((s, i) => "L" + (i + 1));
+    const valores = secciones.map(s => redondear(s.porcentaje));
+
+    const colores = secciones.map(s => {
+      if (s.estado === "ÓPTIMO") return "#009b77";
+      if (s.estado === "EN PROCESO") return "#c9a227";
+      return "#d93025";
+    });
+
+    const nombresCompletos = secciones.map(s => s.nombreSeccion);
+
+    const ctx = document.getElementById("radarLineamientos");
+
+    if (radarLineamientosChart) {
+      radarLineamientosChart.destroy();
+    }
+
+    radarLineamientosChart = new Chart(ctx, {
+      type: "radar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "% de cumplimiento",
+          data: valores,
+          fill: true,
+          backgroundColor: "rgba(47, 137, 189, 0.18)",
+          borderColor: "#2f89bd",
+          borderWidth: 2,
+          pointBackgroundColor: colores,
+          pointBorderColor: colores,
+          pointHoverBackgroundColor: colores,
+          pointHoverBorderColor: "#ffffff",
+          pointRadius: 6,
+          pointHoverRadius: 9
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              title: function(context) {
+                const i = context[0].dataIndex;
+                return nombresCompletos[i];
+              },
+              label: function(context) {
+                const i = context.dataIndex;
+                const s = secciones[i];
+
+                return [
+                  "Cumplimiento: " + redondear(s.porcentaje) + "%",
+                  "Estado: " + s.estado,
+                  "Puntaje: " + s.puntaje + "/" + s.maximo
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          r: {
+            min: 0,
+            max: 100,
+            ticks: {
+              stepSize: 20,
+              callback: value => value + "%"
+            },
+            pointLabels: {
+              font: {
+                size: 12
+              }
+            },
+            grid: {
+              color: "#dbe4ea"
+            },
+            angleLines: {
+              color: "#cbd5e1"
+            }
+          }
+        },
+        onClick: function(event, elements) {
+          if (!elements || elements.length === 0) return;
+
+          const index = elements[0].index;
+          const seccionSeleccionada = secciones[index];
+
+          mostrarPreguntasLineamiento(seccionSeleccionada.seccion);
+        }
+      }
+    });
+  }
+
+  function pintarSecciones(secciones) {
+    const cont = document.getElementById("secciones");
+
+    cont.innerHTML = secciones.map(s => {
+      const pct = redondear(s.porcentaje);
+      const claseCard = clasePorEstado(s.estado);
+      const claseBarra = claseBarraPorEstado(s.estado);
+
+      return `
+        <div class="section-card ${claseCard}">
+          <div class="section-title">
+            ${escaparHTML(s.nombreSeccion)}:
+            ${pct}% - ${s.estado}
+          </div>
+          <div class="section-meta">
+            (puntaje ${s.puntaje}/${s.maximo})
+          </div>
+          <div class="mini-bar-wrap">
+            <div class="mini-bar ${claseBarra}" style="width:${Math.min(pct, 100)}%;"></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function pintarTabla(secciones) {
+    const tbody = document.getElementById("tablaResumen");
+
+    tbody.innerHTML = secciones.map(s => `
+      <tr>
+        <td>${escaparHTML(s.nombreSeccion)}</td>
+        <td>${s.puntaje}</td>
+        <td>${s.maximo}</td>
+        <td>${redondear(s.porcentaje)}%</td>
+        <td>${s.estado}</td>
+      </tr>
+    `).join("");
+  }
+
+  function mostrarPreguntasLineamiento(seccionCodigo) {
+    if (!resultadoActual) return;
+
+    const seccion = resultadoActual.secciones.find(s => s.seccion === seccionCodigo);
+
+    if (!seccion) return;
+
+    const cont = document.getElementById("detalleContenido");
+    const pct = redondear(seccion.porcentaje);
+
+    let html = `
+      <div class="detalle-section-title">
+        ${escaparHTML(seccion.nombreSeccion)}
+        <br>
+        ${pct}% - ${seccion.estado}
+        (puntaje ${seccion.puntaje}/${seccion.maximo})
+      </div>
+    `;
+
+    html += seccion.detalles.map(d => {
+      const clase = clasePregunta(d.estado);
+
+      return `
+        <div class="pregunta-card ${clase}">
+          <div class="pregunta-codigo">
+            ${escaparHTML(d.codigo)} - ${d.puntos}/${d.maximo} puntos
+          </div>
+
+          <div class="pregunta-texto">
+            ${escaparHTML(d.pregunta)}
+          </div>
+
+          <div class="pregunta-respuesta">
+            Respuesta: ${escaparHTML(valorVisible(d.respuesta))}
+            | Estado: ${d.estado}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    cont.innerHTML = html;
+  }
+
+  function clasePregunta(estado) {
+    if (estado === "CUMPLE") return "pregunta-cumple";
+    if (estado === "EN PROCESO") return "pregunta-proceso";
+    return "pregunta-bajo";
+  }
+
+  function valorVisible(valor) {
+    if (valor === null || valor === undefined || valor === "") {
+      return "Sin respuesta";
+    }
+
+    return String(valor);
+  }
+
+  function clasePorEstado(estado) {
+    if (estado === "ÓPTIMO") return "";
+    if (estado === "EN PROCESO") return "section-warning";
+    return "section-danger";
+  }
+
+  function claseBarraPorEstado(estado) {
+    if (estado === "ÓPTIMO") return "mini-optimo";
+    if (estado === "EN PROCESO") return "mini-proceso";
+    return "mini-bajo";
+  }
+
+  function redondear(n) {
+    return Math.round(Number(n) * 10) / 10;
+  }
+
+  function quitarAcentos(texto) {
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function escaparHTML(texto) {
+    return String(texto)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function mostrarError(msg) {
+    const box = document.getElementById("errorBox");
+    box.style.display = "block";
+    box.textContent = msg;
+  }
+
+  function limpiarError() {
+    const box = document.getElementById("errorBox");
+    box.style.display = "none";
+    box.textContent = "";
+  }
+
+  function setEstado(msg) {
+    document.getElementById("estadoCarga").textContent = msg;
+  }
+</script>
+
+</body>
+</html>
