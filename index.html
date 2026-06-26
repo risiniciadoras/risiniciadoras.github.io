@@ -351,12 +351,21 @@
   <div id="errorBox" class="error"></div>
 
   <div class="controls">
-    <label>
+
+<label>
+  DIRESA/GERESA/DIRIS:
+  <select id="filtroRegion"></select>
+</label>
+    
+
+<label>
       Registro/RIS:
       <select id="registroSelect"></select>
     </label>
 
-    <button onclick="renderReporte()">Actualizar reporte</button>
+<button onclick="renderReporte()">BUSCAR</button>
+
+
   </div>
 
   <div class="top-box">
@@ -408,7 +417,7 @@
 
   <!-- DETALLE AL HACER CLIC EN EL RADAR -->
   <div id="detallePreguntas" class="detalle-box">
-    <h2>Preguntas del lineamiento seleccionado</h2>
+    <h2>Preguntas de Aspectos Generales o del Lineamiento seleccionado</h2>
     <div id="detalleContenido">
       Haz clic en un punto del radar para ver las preguntas de ese lineamiento.
     </div>
@@ -421,7 +430,7 @@
     <table>
       <thead>
         <tr>
-          <th>Sección</th>
+          <th>Resumen de avance por línea de intervención</th>
           <th>Puntaje</th>
           <th>Máximo</th>
           <th>%</th>
@@ -450,6 +459,10 @@
   const RIS_LAYER =
     "https://geominsa.minsa.gob.pe/geominsaserver/rest/services/Hosted/INIC_TAB_gdb/FeatureServer/1";
 
+  const REGIONES_LAYER =
+     "https://geominsa.minsa.gob.pe/geominsaserver/rest/services/Hosted/RIS_TOTAL1_gdb/FeatureServer/0";
+
+
   let RIS_FIELD = "ris";
 
   let respuestas = [];
@@ -459,6 +472,8 @@
 
   let radarLineamientosChart = null;
   let resultadoActual = null;
+  let regiones = [];
+
 
   iniciar();
 
@@ -470,6 +485,8 @@
       preguntas = await consultarTodo(PREGUNTAS_LAYER);
       risCatalogo = await consultarTodo(RIS_LAYER);
       respuestas = await consultarTodo(RESPUESTAS_LAYER);
+      regiones = await consultarTodo(REGIONES_LAYER);
+      llenarFiltroRegion()
 
       prepararPreguntas();
       prepararRIS();
@@ -480,7 +497,24 @@
         RIS_FIELD = campoRISDetectado;
       }
 
-      llenarSelectorRegistros();
+      llenarSelectorRegistros("");
+      document.getElementById("filtroRegion").addEventListener("change", function() {
+      document.getElementById("registroSelect").addEventListener("change", renderReporte);
+
+
+  const region = this.value;
+
+  // actualizar selector de RIS según región
+  llenarSelectorRegistros(region);
+
+  // limpiar selección (para activar promedio)
+  document.getElementById("registroSelect").value = "";
+
+  // recalcular reporte
+  renderReporte();
+});
+
+
       renderReporte();
 
       setEstado("Datos cargados correctamente.");
@@ -574,31 +608,50 @@
     return aproximado || null;
   }
 
-  function llenarSelectorRegistros() {
-    const select = document.getElementById("registroSelect");
-    select.innerHTML = "";
 
-    if (!respuestas.length) {
-      const opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent = "No hay registros en la capa de respuestas";
-      select.appendChild(opt);
-      return;
-    }
+function llenarSelectorRegistros(filtroRegion = "") {
 
-    respuestas.forEach((fila, index) => {
-      const codigoRIS = fila[RIS_FIELD];
-      const nombreRIS = obtenerNombreRIS(codigoRIS);
-      const oid = fila.OBJECTID || fila.objectid || fila.ObjectId || index + 1;
+  const select = document.getElementById("registroSelect");
+  select.innerHTML = "";
 
-      const opt = document.createElement("option");
-      opt.value = index;
-      opt.textContent =
-        "Registro " + oid + " | RIS " + (codigoRIS || "-") + " - " + nombreRIS;
+  let datos = respuestas;
 
-      select.appendChild(opt);
+  // filtrar por región
+  if (filtroRegion !== "") {
+    datos = respuestas.filter(f => {
+      const cod = f[RIS_FIELD];
+      const reg = obtenerRegion(cod);
+      return reg === filtroRegion;
     });
   }
+
+  // opción para promedio
+  const optEmpty = document.createElement("option");
+  optEmpty.value = "";
+  optEmpty.textContent = "-- Promedio --";
+  select.appendChild(optEmpty);
+
+  if (!datos.length) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "No hay registros";
+    select.appendChild(opt);
+    return;
+  }
+
+  datos.forEach((fila, index) => {
+    const codigoRIS = fila[RIS_FIELD];
+    const nombreRIS = obtenerNombreRIS(codigoRIS);
+    const oid = fila.OBJECTID || fila.objectid || fila.ObjectId || index + 1;
+
+    const opt = document.createElement("option");
+    opt.value = index;
+    opt.textContent =
+      "Registro " + oid + " | RIS " + (codigoRIS || "-") + " - " + nombreRIS;
+
+    select.appendChild(opt);
+  });
+}
 
   function obtenerNombreRIS(codigo) {
     if (codigo === null || codigo === undefined || codigo === "") return "Sin RIS";
@@ -608,37 +661,141 @@
     return item ? item.label : "RIS " + codigo;
   }
 
+  
+function obtenerRegion(codigoRIS) {
+  const item = regiones.find(r =>
+    Number(r.id_ris) === Number(codigoRIS)
+  );
+  return item ? item.region : "Sin región";
+}
+
+
+function llenarFiltroRegion() {
+
+  const select = document.getElementById("filtroRegion");
+
+  select.innerHTML = "";
+
+  const regionesUnicas = [...new Set(regiones.map(r => r.region))].sort();
+
+  // opción inicial
+  const optAll = document.createElement("option");
+  optAll.value = "";
+  optAll.textContent = "Todas";
+  select.appendChild(optAll);
+
+  regionesUnicas.forEach(reg => {
+    const opt = document.createElement("option");
+    opt.value = reg;
+    opt.textContent = reg;
+    select.appendChild(opt);
+  });
+}
+
   function renderReporte() {
     limpiarError();
 
-    const select = document.getElementById("registroSelect");
-    const index = Number(select.value);
+const select = document.getElementById("registroSelect");
+const valorSeleccion = select.value;
 
-    if (isNaN(index) || !respuestas[index]) {
+const index = valorSeleccion === "" ? null : Number(valorSeleccion);
+
+
+    if (index !== null && (isNaN(index) || !respuestas[index])) {
       mostrarError("No se encontró el registro seleccionado.");
       return;
     }
 
-    const fila = respuestas[index];
-    const codigoRIS = fila[RIS_FIELD];
-    const nombreRIS = obtenerNombreRIS(codigoRIS);
+const regionSeleccionada = document.getElementById("filtroRegion").value;
+const usarPromedio = document.getElementById("registroSelect").value === "";
 
-    document.getElementById("nombreRis").textContent = nombreRIS;
+let resultado;
 
-    const resultado = calcularResultado(fila);
-    resultadoActual = resultado;
+// ✅ CASO 1: PROMEDIO
+if (usarPromedio) {
 
-    pintarGeneral(resultado);
-    pintarRadarLineamientos(resultado.secciones);
-    pintarSecciones(resultado.secciones);
-    pintarTabla(resultado.secciones);
+ let datosFiltrados = respuestas;
 
-    if (resultado.secciones.length > 0) {
-      mostrarPreguntasLineamiento(resultado.secciones[0].seccion);
-    }
+// ✅ SOLO filtrar si hay región seleccionada
+if (regionSeleccionada !== "") {
+  datosFiltrados = respuestas.filter(f => {
+    const cod = f[RIS_FIELD];
+    const reg = obtenerRegion(cod);
+    return reg === regionSeleccionada;
+  });
+}
 
-    setEstado("Reporte generado para " + nombreRIS + ".");
-  }
+
+  const filaPromedio = {};
+
+  preguntas.forEach(p => {
+    let suma = 0;
+    let contador = 0;
+
+
+
+datosFiltrados.forEach(f => {
+
+
+  let val = f[p.name];
+
+  // si viene como texto (formularios)
+  val = puntosPorRespuesta(val);
+
+  suma += val;
+  contador++;
+
+});
+
+
+    filaPromedio[p.name] = contador > 0 ? suma / contador : 0;
+  });
+
+  resultado = calcularResultado(filaPromedio);
+
+  document.getElementById("nombreRis").textContent =
+    "PROMEDIO - " + regionSeleccionada;
+
+}
+// ✅ CASO 2: REGISTRO INDIVIDUAL
+else {
+
+  let datos = respuestas;
+
+// ✅ si hay filtro de región, usar los mismos datos filtrados
+if (regionSeleccionada !== "") {
+  datos = respuestas.filter(f => {
+    const cod = f[RIS_FIELD];
+    const reg = obtenerRegion(cod);
+    return reg === regionSeleccionada;
+  });
+}
+
+const fila = datos[index];
+
+  const codigoRIS = fila[RIS_FIELD];
+  const nombreRIS = obtenerNombreRIS(codigoRIS);
+  const region = obtenerRegion(codigoRIS);
+
+  document.getElementById("nombreRis").textContent =
+    nombreRIS + " (" + region + ")";
+
+  resultado = calcularResultado(fila);
+}
+
+// ✅ DIBUJAR (esto NO cambia)
+resultadoActual = resultado;
+
+pintarGeneral(resultado);
+pintarRadarLineamientos(resultado.secciones);
+pintarSecciones(resultado.secciones);
+pintarTabla(resultado.secciones);
+
+if (resultado.secciones.length > 0) {
+  mostrarPreguntasLineamiento(resultado.secciones[0].seccion);
+}
+
+}
 
   function calcularResultado(fila) {
     const grupos = {};
@@ -695,26 +852,34 @@
     };
   }
 
-  function puntosPorRespuesta(valor) {
-    if (valor === null || valor === undefined || valor === "") return 0;
 
-    const vOriginal = String(valor).trim();
-    const v = quitarAcentos(vOriginal.toLowerCase());
+function puntosPorRespuesta(valor) {
 
-    if (v === "2") return 2;
-    if (v === "1") return 1;
-    if (v === "0") return 0;
-
-    if (v.includes("no cumple")) return 0;
-    if (v.includes("en proceso")) return 1;
-    if (v.includes("cumple")) return 2;
-
-    if (v === "si" || v === "sí" || v === "yes") return 2;
-    if (v === "parcial") return 1;
-    if (v === "no") return 0;
-
-    return 0;
+  // ✅ SI YA ES NÚMERO (PROMEDIO), USAR DIRECTO
+  if (typeof valor === "number") {
+    return valor;
   }
+
+  if (valor === null || valor === undefined || valor === "") return 0;
+
+  const vOriginal = String(valor).trim();
+  const v = quitarAcentos(vOriginal.toLowerCase());
+
+  if (v === "2") return 2;
+  if (v === "1") return 1;
+  if (v === "0") return 0;
+
+  if (v.includes("no cumple")) return 0;
+  if (v.includes("en proceso")) return 1;
+  if (v.includes("cumple")) return 2;
+
+  if (v === "si" || v === "sí" || v === "yes") return 2;
+  if (v === "parcial") return 1;
+  if (v === "no") return 0;
+
+  return 0;
+}
+
 
   function estadoPregunta(puntos) {
     if (puntos === 2) return "CUMPLE";
@@ -732,33 +897,88 @@
     return "ÓPTIMO";
   }
 
-  function pintarGeneral(resultado) {
-    const pct = redondear(resultado.porcentajeTotal);
+function pintarGeneral(resultado) {
 
-    const barra = document.getElementById("barraGeneral");
-    barra.style.width = Math.max(4, Math.min(pct, 100)) + "%";
-    barra.textContent = pct + "%";
+  const pct = redondear(resultado.porcentajeTotal);
 
-    document.getElementById("resumenGeneral").textContent =
-      "Avance final obtenido: " + pct + "% - " +
-      resultado.estadoTotal +
-      " (puntaje " + resultado.puntajeTotal + "/" + resultado.maximoTotal + ")";
+  // ✅ crea primero la variable
+  const puntajeFormateado = redondear(resultado.puntajeTotal);
 
-    document.getElementById("kpiPuntaje").textContent =
-      resultado.puntajeTotal + "/" + resultado.maximoTotal;
+  // ✅ COLOR
+  let color = "#009b77";
+  if (resultado.estadoTotal === "EN PROCESO") color = "#c9a227";
+  if (resultado.estadoTotal === "BAJO") color = "#d93025";
 
-    document.getElementById("kpiPreguntas").textContent =
-      preguntas.length;
+  // ✅ KPI
+  document.getElementById("kpiPuntaje").textContent =
+    puntajeFormateado + "/" + resultado.maximoTotal;
 
-    document.getElementById("kpiEstado").textContent =
-      resultado.estadoTotal;
-  }
+  document.getElementById("kpiPreguntas").textContent =
+    preguntas.length;
+
+  const estadoEl = document.getElementById("kpiEstado");
+  estadoEl.textContent = resultado.estadoTotal;
+  estadoEl.style.color = color;
+
+  // ✅ BARRA
+  const barra = document.getElementById("barraGeneral");
+  barra.style.width = Math.max(4, Math.min(pct, 100)) + "%";
+  barra.textContent = pct + "%";
+  barra.style.background = color;
+
+  // ✅ RESUMEN
+  const resumen = document.getElementById("resumenGeneral");
+
+// ✅ estilos dinámicos según estado
+let bg = "#eaf8f0";   // verde claro
+let borde = "#009b77";
+
+if (resultado.estadoTotal === "EN PROCESO") {
+  bg = "#fff8d9";     // amarillo claro
+  borde = "#c9a227";
+}
+if (resultado.estadoTotal === "BAJO") {
+  bg = "#fdecea";     // rojo claro
+  borde = "#d93025";
+}
+
+// ✅ aplicar estilos al cuadro
+resumen.style.background = bg;
+resumen.style.border = "2px solid " + borde; // ✅ AQUÍ está la clave
+resumen.style.color = borde;
+
+
+// ✅ contenido (igual que antes, pero correcto)
+resumen.innerHTML =
+  "Avance final obtenido: <strong>" + pct + "%</strong> - " +
+  "<span style='color:" + color + "'>" + resultado.estadoTotal + "</span>" +
+  " (puntaje " + puntajeFormateado + "/" + resultado.maximoTotal + ")";
+
+// ✅ SOLO colores del cuadro (sin tocar estructura)
+if (resultado.estadoTotal === "ÓPTIMO") {
+  resumen.style.background = "#eaf8f0";
+  resumen.style.border = "2px solid #009b77";
+}
+
+if (resultado.estadoTotal === "EN PROCESO") {
+  resumen.style.background = "#fff8d9";
+  resumen.style.border = "2px solid #c9a227";
+}
+
+if (resultado.estadoTotal === "BAJO") {
+  resumen.style.background = "#fdecea";
+  resumen.style.border = "2px solid #d93025";
+}
+
+}
 
   function pintarRadarLineamientos(secciones) {
-    const labels = secciones.map((s, i) => "L" + (i + 1));
-    const valores = secciones.map(s => redondear(s.porcentaje));
+    const seccionesFiltradas = secciones.slice(1, 12);
 
-    const colores = secciones.map(s => {
+	const labels = seccionesFiltradas.map((s, i) => "L" + (i + 1));
+	const valores = seccionesFiltradas.map(s => redondear(s.porcentaje));
+
+    const colores = seccionesFiltradas.map(s => {
       if (s.estado === "ÓPTIMO") return "#009b77";
       if (s.estado === "EN PROCESO") return "#c9a227";
       return "#d93025";
@@ -806,7 +1026,8 @@
               },
               label: function(context) {
                 const i = context.dataIndex;
-                const s = secciones[i];
+                const s = seccionesFiltradas[i];
+
 
                 return [
                   "Cumplimiento: " + redondear(s.porcentaje) + "%",
@@ -842,7 +1063,7 @@
           if (!elements || elements.length === 0) return;
 
           const index = elements[0].index;
-          const seccionSeleccionada = secciones[index];
+          const seccionSeleccionada = seccionesFiltradas[index];
 
           mostrarPreguntasLineamiento(seccionSeleccionada.seccion);
         }
@@ -865,7 +1086,7 @@
             ${pct}% - ${s.estado}
           </div>
           <div class="section-meta">
-            (puntaje ${s.puntaje}/${s.maximo})
+            (puntaje ${redondear(s.puntaje)}/${s.maximo})
           </div>
           <div class="mini-bar-wrap">
             <div class="mini-bar ${claseBarra}" style="width:${Math.min(pct, 100)}%;"></div>
@@ -881,7 +1102,7 @@
     tbody.innerHTML = secciones.map(s => `
       <tr>
         <td>${escaparHTML(s.nombreSeccion)}</td>
-        <td>${s.puntaje}</td>
+        <td>${redondear(s.puntaje)}</td>
         <td>${s.maximo}</td>
         <td>${redondear(s.porcentaje)}%</td>
         <td>${s.estado}</td>
