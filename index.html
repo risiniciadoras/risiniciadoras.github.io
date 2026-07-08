@@ -340,6 +340,69 @@
     .dot-green { background: #009b77; }
     .dot-yellow { background: #c9a227; }
     .dot-red { background: #d93025; }
+
+.comparacion-box{
+  margin-top:40px;
+}
+
+#resumenRegion{
+  margin-bottom:20px;
+  font-weight:bold;
+  color:#0b5394;
+}
+
+#comparacionRIS{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
+  gap:20px;
+}
+
+.ris-card{
+  background:white;
+  border:1px solid #dbe4ea;
+  border-radius:10px;
+  padding:15px;
+}
+
+.ris-card h3{
+  margin-top:0;
+  color:#0b5394;
+}
+
+.ris-total{
+  font-size:22px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.ris-radar{
+  height:250px;
+}
+
+.ris-lineamiento{
+  margin-top:8px;
+}
+
+.ris-lineamiento-label{
+  font-size:12px;
+}
+
+.ris-barra{
+  height:8px;
+  background:#e5e7eb;
+  border-radius:4px;
+  overflow:hidden;
+}
+
+.ris-barra-fill{
+  height:8px;
+  background:#2f89bd;
+}
+
+
+
+
+
   </style>
 </head>
 
@@ -441,6 +504,24 @@
     </table>
   </div>
 
+<!-- COMPARACIÓN DE RIS -->
+<div class="comparacion-box">
+
+  <h2>Comparación de RIS de la región</h2>
+<div class="radar-box">
+  <h3>Radar comparativo de RIS</h3>
+
+  <div class="radar-wrap">
+    <canvas id="radarComparativo"></canvas>
+  </div>
+</div>
+
+  <div id="resumenRegion"></div>
+
+  <div id="comparacionRIS"></div>
+
+</div>
+
   <div id="estadoCarga" class="status"></div>
 
 </div>
@@ -471,6 +552,7 @@
   let campoRISDetectado = null;
 
   let radarLineamientosChart = null;
+  let radarComparativoChart = null;
   let resultadoActual = null;
   let regiones = [];
 
@@ -793,6 +875,10 @@ pintarTabla(resultado.secciones);
 
 if (resultado.secciones.length > 0) {
   mostrarPreguntasLineamiento(resultado.secciones[0].seccion);
+}
+
+if(regionSeleccionada !== ""){
+  pintarComparacionRIS(regionSeleccionada);
 }
 
 }
@@ -1178,6 +1264,303 @@ if (resultado.estadoTotal === "BAJO") {
     if (estado === "EN PROCESO") return "mini-proceso";
     return "mini-bajo";
   }
+
+function pintarComparacionRIS(region) {
+
+  const cont = document.getElementById("comparacionRIS");
+  const resumen = document.getElementById("resumenRegion");
+
+  cont.innerHTML = "";
+
+  if (!region) {
+    resumen.innerHTML =
+      "Seleccione una región para comparar RIS.";
+    return;
+  }
+
+const datosRegion = respuestas.filter(f => {
+  const cod = f[RIS_FIELD];
+  return obtenerRegion(cod) === region;
+});
+
+dibujarRadarComparativo(datosRegion);
+
+  resumen.innerHTML =
+    "RIS con respuestas registradas: " +
+    datosRegion.length;
+
+  datosRegion.forEach((fila, idx) => {
+
+    const codigoRIS = fila[RIS_FIELD];
+
+    const nombreRIS =
+      obtenerNombreRIS(codigoRIS);
+
+    const resultado =
+      calcularResultado(fila);
+
+    let colorEstado = "#009b77";
+
+if (resultado.estadoTotal === "EN PROCESO") {
+  colorEstado = "#c9a227";
+}
+
+if (resultado.estadoTotal === "BAJO") {
+  colorEstado = "#d93025";
+}
+    
+
+    const card = document.createElement("div");
+
+    card.className = "ris-card";
+
+if (resultado.estadoTotal === "ÓPTIMO") {
+  card.style.borderLeft = "8px solid #009b77";
+}
+
+if (resultado.estadoTotal === "EN PROCESO") {
+  card.style.borderLeft = "8px solid #c9a227";
+}
+
+if (resultado.estadoTotal === "BAJO") {
+  card.style.borderLeft = "8px solid #d93025";
+}
+
+    card.innerHTML = `
+      <h3>${nombreRIS}</h3>
+
+      <div
+  class="ris-total"
+  style="color:${colorEstado};">
+  ${redondear(resultado.porcentajeTotal)}%
+  - ${resultado.estadoTotal}
+</div>
+
+
+
+      <div id="lineamientosRIS_${idx}"></div>
+    `;
+
+    cont.appendChild(card);
+
+
+
+    dibujarLineamientosRIS(
+      "lineamientosRIS_" + idx,
+      resultado
+    );
+  });
+}
+
+
+function dibujarRadarRIS(idCanvas, resultado){
+
+  const secciones =
+    resultado.secciones.slice(1,12);
+
+  const ctx =
+    document.getElementById(idCanvas);
+
+  new Chart(ctx, {
+
+    type:"radar",
+
+    data:{
+      labels: secciones.map((s,i)=>
+        "L"+(i+1)
+      ),
+
+      datasets:[{
+        data: secciones.map(s=>
+          redondear(s.porcentaje)
+        ),
+
+        fill:true,
+        backgroundColor:
+          "rgba(47,137,189,0.15)",
+
+        borderColor:"#2f89bd",
+
+        borderWidth:2
+      }]
+    },
+
+    options:{
+      responsive:true,
+
+      plugins:{
+        legend:{
+          display:false
+        }
+      },
+
+      scales:{
+        r:{
+          min:0,
+          max:100
+        }
+      }
+    }
+  });
+}
+
+function dibujarLineamientosRIS(idDiv, resultado){
+
+  const cont =
+    document.getElementById(idDiv);
+
+  cont.innerHTML =
+    resultado.secciones
+      .slice(1,12)
+      .map((s,i)=>`
+
+      <div class="ris-lineamiento">
+
+        <div
+  class="ris-lineamiento-label"
+  style="
+    font-weight:bold;
+    color:${
+      s.estado === 'ÓPTIMO'
+        ? '#009b77'
+        : s.estado === 'EN PROCESO'
+        ? '#c9a227'
+        : '#d93025'
+    };
+  ">
+  L${i+1}: ${redondear(s.porcentaje)}%
+  - ${s.estado}
+</div>
+
+        <div class="ris-barra">
+
+          <div
+  class="ris-barra-fill"
+  style="
+    width:${s.porcentaje}%;
+    background:${
+      s.estado === 'ÓPTIMO'
+        ? '#009b77'
+        : s.estado === 'EN PROCESO'
+        ? '#c9a227'
+        : '#d93025'
+    };
+  ">
+</div>
+
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+function dibujarRadarComparativo(datosRegion){
+
+  const colores = [
+    "#0b5394",
+    "#009b77",
+    "#d93025",
+    "#c9a227",
+    "#7b1fa2",
+    "#ff6f00",
+    "#00838f",
+    "#5d4037",
+    "#1565c0",
+    "#2e7d32",
+    "#ad1457",
+    "#6a1b9a"
+  ];
+
+  const datasets = [];
+
+  datosRegion.forEach((fila, idx) => {
+
+    const resultado =
+      calcularResultado(fila);
+
+    const secciones =
+      resultado.secciones.slice(1,12);
+
+    datasets.push({
+
+      label:
+        obtenerNombreRIS(
+          fila[RIS_FIELD]
+        ),
+
+      data:
+        secciones.map(s =>
+          redondear(s.porcentaje)
+        ),
+
+      borderColor:
+        colores[idx % colores.length],
+
+      backgroundColor:
+        colores[idx % colores.length],
+
+      fill:false,
+
+      borderWidth:2,
+
+      pointRadius:4
+    });
+
+  });
+
+const primerResultado =
+  calcularResultado(datosRegion[0]);
+
+const labels =
+  primerResultado.secciones
+    .slice(1,12)
+    .map((s,i)=>"L"+(i+1));
+
+  const ctx =
+    document.getElementById(
+      "radarComparativo"
+    );
+
+  if(radarComparativoChart){
+    radarComparativoChart.destroy();
+  }
+
+  radarComparativoChart =
+    new Chart(ctx, {
+
+      type:"radar",
+
+      data:{
+        labels,
+        datasets
+      },
+
+      options:{
+
+        responsive:true,
+
+        maintainAspectRatio:false,
+
+        plugins:{
+          legend:{
+            display:true,
+            position:"bottom"
+          }
+        },
+
+        scales:{
+          r:{
+            min:0,
+            max:100,
+            ticks:{
+              stepSize:20
+            }
+          }
+        }
+      }
+    });
+}
 
   function redondear(n) {
     return Math.round(Number(n) * 10) / 10;
