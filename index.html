@@ -1414,14 +1414,27 @@ if (resultado.estadoTotal === "BAJO") {
     const cont = document.getElementById("detalleContenido");
     const pct = redondear(seccion.porcentaje);
 
-    let html = `
-      <div class="detalle-section-title">
-        ${escaparHTML(seccion.nombreSeccion)}
-        <br>
-        ${pct}% - ${seccion.estado}
-        (puntaje ${seccion.puntaje}/${seccion.maximo})
-      </div>
-    `;
+let colorEstado = "#009b77";
+
+if (seccion.estado === "EN PROCESO") {
+  colorEstado = "#c9a227";
+}
+
+if (seccion.estado === "BAJO") {
+  colorEstado = "#d93025";
+}
+
+let html = `
+  <div class="detalle-section-title"
+       style="
+         text-align:center;
+         color:${colorEstado};
+         font-weight:bold;
+       ">
+    ${pct}% - ${seccion.estado}
+    (puntaje ${seccion.puntaje}/${seccion.maximo})
+  </div>
+`;
 
     html += seccion.detalles.map(d => {
       const clase = clasePregunta(d.estado);
