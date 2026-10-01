@@ -12,15 +12,16 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #ffffff;
+      background: #e6e6e6;
       color: #1f2933;
     }
 
     .page {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 18px;
-    }
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 18px;
+  background: #e6e6e6;
+}
 
     h1 {
       font-size: 19px;
@@ -34,6 +35,8 @@
       background: #eef8f7;
       padding: 14px;
       margin-bottom: 22px;
+      border-radius: 8px;
+      overflow: hidden;
     }
 
     .top-title {
@@ -49,8 +52,10 @@
     }
 
     .controls {
-      background: #f1f5f9;
+      background: #e6e6e6;
       padding: 12px;
+      border: 1px solid #b5b5b5;
+      border-left: 6px solid #2f80b7;	
       border-radius: 8px;
       margin-bottom: 18px;
       display: flex;
@@ -59,13 +64,29 @@
       align-items: center;
     }
 
-    select,
-    button {
-      padding: 9px 12px;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      font-size: 14px;
-    }
+select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid #8f8f8f;
+  background: #f0f0f0;
+  font-size: 14px;
+}
+
+#selectorLinea{
+  color:#0b5394;
+  font-weight:bold;
+  font-size:16px;
+  text-align-last:center;
+  background:#f0f0f0;
+}
+
+button {
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
 
     button {
       background: #16803c;
@@ -124,6 +145,9 @@
       background: #eaf8f0;
       font-size: 14px;
       line-height: 1.35;
+      border-radius: 8px;
+      overflow: hidden;
+
     }
 
     .section-warning {
@@ -180,8 +204,8 @@
     }
 
     .kpi {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: #e6e6e6;
+      border: 1px solid #b8b8b8;
       border-radius: 8px;
       padding: 12px;
     }
@@ -191,6 +215,7 @@
       color: #64748b;
       font-weight: bold;
       text-transform: uppercase;
+      text-align:center;
     }
 
     .kpi-value {
@@ -198,6 +223,7 @@
       font-size: 24px;
       font-weight: bold;
       color: #0b5394;
+      text-align:center;
     }
 
     .error {
@@ -242,8 +268,7 @@
     .radar-box {
       margin-top: 24px;
       margin-bottom: 20px;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
+      background: #e6e6e6;
       border-radius: 10px;
       padding: 16px;
     }
@@ -265,22 +290,22 @@
     .detalle-box {
       margin-top: 16px;
       margin-bottom: 24px;
-      background: #f8fafc;
-      border: 1px solid #dbe4ea;
+      background: #e6e6e6;
+      border: 1px solid #b5b5b5;
       border-radius: 10px;
-      padding: 16px;
+      padding: 8px 16px 16px 16px;
     }
 
     .detalle-section-title {
       font-weight: bold;
       font-size: 15px;
       margin-bottom: 10px;
-      color: #0b5394;
+      color: #000000;
       line-height: 1.4;
     }
 
     .pregunta-card {
-      background: white;
+      background: #f0f0f0;
       border-left: 5px solid #94a3b8;
       margin-bottom: 10px;
       padding: 10px;
@@ -343,6 +368,28 @@
 
 .comparacion-box{
   margin-top:40px;
+  border:1px solid #9e9e9e;
+  border-radius:10px;
+  padding:15px;
+}
+
+.comparacion-box h2{
+    text-align:center;
+    color:#0b5394;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.radar-box h3{
+    text-align:center;
+}
+
+.detalle-box h2{
+    text-align:center;
+    margin:10px 0 15px 0;
+    color:#0b5394;
+    font-size:24px;
+    font-weight:bold;
 }
 
 #resumenRegion{
@@ -358,10 +405,10 @@
 }
 
 .ris-card{
-  background:white;
-  border:1px solid #dbe4ea;
-  border-radius:10px;
-  padding:15px;
+  background:#f0f0f0;
+  border:1px solid #b5b5b5;
+  border-radius:6px;
+  padding:10px;
 }
 
 .ris-card h3{
@@ -401,16 +448,94 @@
 
 
 
+.header-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    width:100%;
+    margin-bottom:30px;
+}
 
+.header-top h1{
+    margin-top: 55px;
 
-  </style>
+}
+
+.logo-header{
+    height:90px;
+    width:auto;
+}
+
+.titulo-lineamientos{
+    text-align:center;
+    margin:25px 0 15px 0;
+    color:#0b5394;
+    font-size:24px;
+    font-weight:bold;
+}
+.section-card,
+.section-warning,
+.section-danger {
+    color: #000000 !important;
+}
+
+.titulo-seccion-box{
+    border: 1px solid #9e9e9e;
+    border-radius: 8px;
+    background: #e6e6e6;
+    margin: 20px 0;
+    padding: 10px;
+}
+
+.titulo-lineamientos{
+    text-align:center;
+    margin:0;
+    color:#0b5394;
+    font-size:24px;
+    font-weight:bold;
+}
+.avance-box{
+    border: 1px solid #9e9e9e;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+</style>
+
 </head>
 
 <body>
 <div class="page">
 
-  <h1>Reporte de avance final</h1>
+ <div class="header-top">
 
+    <h1>REPORTE DE AVANCE FINAL</h1>
+
+    <img
+      src="https://geominsa.minsa.gob.pe/geominsaportal/sharing/rest/content/items/2e28a34558d34df4bdd5ac525a438bc9/data"
+      alt="Logo"
+      class="logo-header"
+    />
+
+</div>
+
+
+
+
+<div class="kpi-grid" style="margin-bottom:20px;">
+
+  <div class="kpi">
+    <div class="kpi-title">RIS REGISTRADAS</div>
+    <div id="kpiRIS" class="kpi-value">0</div>
+  </div>
+
+  <div class="kpi">
+    <div class="kpi-title">AVANCE NACIONAL</div>
+    <div id="kpiNacional" class="kpi-value">0%</div>
+  </div>
+
+</div>
   <div id="errorBox" class="error"></div>
 
   <div class="controls">
@@ -431,20 +556,19 @@
 
   </div>
 
-  <div class="top-box">
-    <div class="top-title">Reporte de avance</div>
-    <div class="top-ris">RIS: <span id="nombreRis">-</span></div>
-  </div>
+  
 
   <div class="kpi-grid">
+
+
     <div class="kpi">
       <div class="kpi-title">Puntaje obtenido</div>
-      <div id="kpiPuntaje" class="kpi-value">0/90</div>
+      <div id="kpiPuntaje" class="kpi-value">0/94</div>
     </div>
 
     <div class="kpi">
       <div class="kpi-title">Preguntas evaluadas</div>
-      <div id="kpiPreguntas" class="kpi-value">45</div>
+      <div id="kpiPreguntas" class="kpi-value">47</div>
     </div>
 
     <div class="kpi">
@@ -465,12 +589,13 @@
 
   <!-- RADAR POR LINEAMIENTO -->
   <div class="radar-box">
-    <h2>Radar de cumplimiento por lineamiento</h2>
+    <h2>Radar de cumplimiento por Línea de Intervención</h2>
 
     <div class="legend-inline">
-      <div class="legend-item"><span class="dot dot-green"></span> Óptimo &gt; 75%</div>
-      <div class="legend-item"><span class="dot dot-yellow"></span> En proceso &gt; 30% y ≤ 75%</div>
-      <div class="legend-item"><span class="dot dot-red"></span> Bajo ≤ 30%</div>
+      <div class="legend-item"><span class="dot dot-green"></span> Óptimo ≥ 80%</div>
+      <div class="legend-item"><span class="dot dot-yellow"></span> En proceso ≥ 30% y < 80%</div>
+      <div class="legend-item"><span class="dot dot-red"></span> Bajo < 30%</div>
+
     </div>
 
     <div class="radar-wrap">
@@ -480,34 +605,47 @@
 
   <!-- DETALLE AL HACER CLIC EN EL RADAR -->
   <div id="detallePreguntas" class="detalle-box">
-    <h2>Preguntas de Aspectos Generales o del Lineamiento seleccionado</h2>
+    <h2>VERIFICADORES</h2>
+
+<div style="margin-bottom:15px;text-align:center;">
+<label for="selectorLinea" style="font-weight:bold;">Seleccionar Línea de Intervención:</label>
+
+<select id="selectorLinea">
+  background:#ffffff;
+  border:2px solid #0b5394;
+  color:#0b5394;
+  font-weight:bold;
+  font-size:16px;
+  height:50px;
+">
+
+<option value="">Seleccione una línea</option>
+</select>
+</div>
+
     <div id="detalleContenido">
-      Haz clic en un punto del radar para ver las preguntas de ese lineamiento.
+      Haz clic en un punto del radar para ver las preguntas de ese Línea de Intervención.
     </div>
   </div>
 
-  <!-- TARJETAS POR SECCIÓN -->
-  <div id="secciones"></div>
 
-  <div class="table-box">
-    <table>
-      <thead>
-        <tr>
-          <th>Resumen de avance por línea de intervención</th>
-          <th>Puntaje</th>
-          <th>Máximo</th>
-          <th>%</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-      <tbody id="tablaResumen"></tbody>
-    </table>
-  </div>
+
+
+  <!-- TARJETAS POR SECCIÓN -->
+
+<div class="avance-box"> 
+<h2 class="titulo-lineamientos">
+  AVANCE POR LÍNEA DE INTERVENCIÓN
+</h2>
+
+
+<div id="secciones"></div>
+</div>
 
 <!-- COMPARACIÓN DE RIS -->
 <div class="comparacion-box">
 
-  <h2>Comparación de RIS de la región</h2>
+  <h2>COMPARACIÓN ENTRE RIS DE DIRESA/GERESA/DIRIS</h2>
 <div class="radar-box">
   <h3>Radar comparativo de RIS</h3>
 
@@ -532,7 +670,7 @@
   // =============================
 
   const RESPUESTAS_LAYER =
-    "https://geominsa.minsa.gob.pe/geominsaserver/rest/services/Hosted/service_baf0c1e7a6874c5384325fa606a88ed0/FeatureServer/0";
+    "https://geominsa.minsa.gob.pe/geominsaserver/rest/services/Hosted/service_6bfc90a9c10846f18e1397516e7d76f3_form/FeatureServer/0";
 
   const PREGUNTAS_LAYER =
     "https://geominsa.minsa.gob.pe/geominsaserver/rest/services/Hosted/INIC_TAB_gdb/FeatureServer/2";
@@ -567,7 +705,21 @@
       preguntas = await consultarTodo(PREGUNTAS_LAYER);
       risCatalogo = await consultarTodo(RIS_LAYER);
       respuestas = await consultarTodo(RESPUESTAS_LAYER);
+
+console.log("RESPUESTAS");
+console.table(respuestas);
+
+console.log("PRIMERA RESPUESTA");
+console.log(respuestas[0]);
+
       regiones = await consultarTodo(REGIONES_LAYER);
+
+console.log("REGIONES");
+console.table(regiones);
+
+console.log("PRIMERA REGION");
+console.log(regiones[0]);
+
       llenarFiltroRegion()
 
       prepararPreguntas();
@@ -699,13 +851,11 @@ function llenarSelectorRegistros(filtroRegion = "") {
   let datos = respuestas;
 
   // filtrar por región
-  if (filtroRegion !== "") {
-    datos = respuestas.filter(f => {
-      const cod = f[RIS_FIELD];
-      const reg = obtenerRegion(cod);
-      return reg === filtroRegion;
-    });
-  }
+ if (filtroRegion !== "") {
+  datos = respuestas.filter(f => {
+    return f.region === filtroRegion;
+  });
+}
 
   // opción para promedio
   const optEmpty = document.createElement("option");
@@ -748,6 +898,14 @@ function obtenerRegion(codigoRIS) {
   const item = regiones.find(r =>
     Number(r.id_ris) === Number(codigoRIS)
   );
+
+  console.log(
+    "RIS:",
+    codigoRIS,
+    "Encontrado:",
+    item
+  );
+
   return item ? item.region : "Sin región";
 }
 
@@ -802,7 +960,7 @@ if (usarPromedio) {
 if (regionSeleccionada !== "") {
   datosFiltrados = respuestas.filter(f => {
     const cod = f[RIS_FIELD];
-    const reg = obtenerRegion(cod);
+    return f.region === regionSeleccionada;
     return reg === regionSeleccionada;
   });
 }
@@ -835,8 +993,6 @@ datosFiltrados.forEach(f => {
 
   resultado = calcularResultado(filaPromedio);
 
-  document.getElementById("nombreRis").textContent =
-    "PROMEDIO - " + regionSeleccionada;
 
 }
 // ✅ CASO 2: REGISTRO INDIVIDUAL
@@ -847,9 +1003,8 @@ else {
 // ✅ si hay filtro de región, usar los mismos datos filtrados
 if (regionSeleccionada !== "") {
   datos = respuestas.filter(f => {
-    const cod = f[RIS_FIELD];
-    const reg = obtenerRegion(cod);
-    return reg === regionSeleccionada;
+    return f.region === regionSeleccionada;
+
   });
 }
 
@@ -857,10 +1012,8 @@ const fila = datos[index];
 
   const codigoRIS = fila[RIS_FIELD];
   const nombreRIS = obtenerNombreRIS(codigoRIS);
-  const region = obtenerRegion(codigoRIS);
+  const region = fila.region;
 
-  document.getElementById("nombreRis").textContent =
-    nombreRIS + " (" + region + ")";
 
   resultado = calcularResultado(fila);
 }
@@ -869,9 +1022,36 @@ const fila = datos[index];
 resultadoActual = resultado;
 
 pintarGeneral(resultado);
+
+// RIS registradas
+document.getElementById("kpiRIS").textContent =
+  respuestas.length;
+
+// Avance nacional
+const avanceNacional = calcularAvanceNacional();
+
+document.getElementById("kpiNacional").textContent =
+  redondear(avanceNacional) + "%";
+
+function calcularAvanceNacional() {
+
+  if (respuestas.length === 0) return 0;
+
+  let suma = 0;
+
+  respuestas.forEach(fila => {
+    const resultado = calcularResultado(fila);
+    suma += resultado.porcentajeTotal;
+  });
+
+  return suma / respuestas.length;
+}
+
 pintarRadarLineamientos(resultado.secciones);
 pintarSecciones(resultado.secciones);
-pintarTabla(resultado.secciones);
+llenarSelectorLineas(resultado.secciones);
+mostrarPreguntasLineamiento(resultado.secciones[0].seccion);
+
 
 if (resultado.secciones.length > 0) {
   mostrarPreguntasLineamiento(resultado.secciones[0].seccion);
@@ -926,7 +1106,7 @@ if(regionSeleccionada !== ""){
     });
 
     const puntajeTotal = secciones.reduce((acc, s) => acc + s.puntaje, 0);
-    const maximoTotal = secciones.reduce((acc, s) => acc + s.maximo, 0);
+    const maximoTotal = 94;
     const porcentajeTotal = maximoTotal > 0 ? (puntajeTotal / maximoTotal) * 100 : 0;
 
     return {
@@ -974,12 +1154,12 @@ function puntosPorRespuesta(valor) {
   }
 
   // REGLA ACTUALIZADA:
-  // <= 30% = BAJO
-  // > 30% y <= 75% = EN PROCESO
-  // > 75% = ÓPTIMO
+  // < 30% = BAJO
+  // >= 30% y < 80% = EN PROCESO
+  // >= 80% = ÓPTIMO
   function clasificar(porcentaje) {
-    if (porcentaje <= 30) return "BAJO";
-    if (porcentaje <= 75) return "EN PROCESO";
+    if (porcentaje < 30) return "BAJO";
+    if (porcentaje < 80) return "EN PROCESO";
     return "ÓPTIMO";
   }
 
@@ -999,7 +1179,7 @@ function pintarGeneral(resultado) {
   document.getElementById("kpiPuntaje").textContent =
     puntajeFormateado + "/" + resultado.maximoTotal;
 
-  document.getElementById("kpiPreguntas").textContent =
+  document.getElementById("kpiPreguntas").textContent = 47;
     preguntas.length;
 
   const estadoEl = document.getElementById("kpiEstado");
@@ -1070,7 +1250,8 @@ if (resultado.estadoTotal === "BAJO") {
       return "#d93025";
     });
 
-    const nombresCompletos = secciones.map(s => s.nombreSeccion);
+    const nombresCompletos =
+       seccionesFiltradas.map(s => s.nombreSeccion);
 
     const ctx = document.getElementById("radarLineamientos");
 
@@ -1220,9 +1401,7 @@ if (resultado.estadoTotal === "BAJO") {
 
       return `
         <div class="pregunta-card ${clase}">
-          <div class="pregunta-codigo">
-            ${escaparHTML(d.codigo)} - ${d.puntos}/${d.maximo} puntos
-          </div>
+          
 
           <div class="pregunta-texto">
             ${escaparHTML(d.pregunta)}
@@ -1279,8 +1458,7 @@ function pintarComparacionRIS(region) {
   }
 
 const datosRegion = respuestas.filter(f => {
-  const cod = f[RIS_FIELD];
-  return obtenerRegion(cod) === region;
+  return f.region === region;
 });
 
 dibujarRadarComparativo(datosRegion);
@@ -1561,6 +1739,48 @@ const labels =
       }
     });
 }
+
+
+function llenarSelectorLineas(secciones) {
+
+  const select = document.getElementById("selectorLinea");
+
+  select.innerHTML = "";
+    
+
+  // Aspectos Generales
+  const optAG = document.createElement("option");
+  optAG.value = secciones[0].seccion;
+  optAG.textContent = "Aspectos Generales";
+  select.appendChild(optAG);
+
+  // L1 a L11
+  secciones.slice(1,12).forEach((s,i) => {
+
+    const opt = document.createElement("option");
+
+    opt.value = s.seccion;
+
+    opt.textContent =
+      "L" + (i + 1) + " - " + s.nombreSeccion;
+
+    select.appendChild(opt);
+
+  });
+
+  select.onchange = function() {
+
+    if (!this.value) return;
+
+    mostrarPreguntasLineamiento(this.value);
+
+  };
+
+// Seleccionar Aspectos Generales por defecto
+select.value = secciones[0].seccion;
+
+}
+
 
   function redondear(n) {
     return Math.round(Number(n) * 10) / 10;
