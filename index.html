@@ -526,7 +526,12 @@ button {
 <div class="kpi-grid" style="margin-bottom:20px;">
 
   <div class="kpi">
-    <div class="kpi-title">RIS REGISTRADAS</div>
+    <div id="tituloKpiRIS" class="kpi-title">
+  RIS REGISTRADAS
+</div>
+
+
+
     <div id="kpiRIS" class="kpi-value">0</div>
   </div>
 
@@ -878,8 +883,7 @@ function llenarSelectorRegistros(filtroRegion = "") {
 
     const opt = document.createElement("option");
     opt.value = index;
-    opt.textContent =
-      "Registro " + oid + " | RIS " + (codigoRIS || "-") + " - " + nombreRIS;
+    opt.textContent = nombreRIS;
 
     select.appendChild(opt);
   });
@@ -1024,8 +1028,31 @@ resultadoActual = resultado;
 pintarGeneral(resultado);
 
 // RIS registradas
+let totalRIS;
+
+if (regionSeleccionada === "") {
+  totalRIS = respuestas.length;
+} else {
+  totalRIS = respuestas.filter(f =>
+    f.region === regionSeleccionada
+  ).length;
+}
+
 document.getElementById("kpiRIS").textContent =
-  respuestas.length;
+  totalRIS;
+
+const tituloRIS =
+  document.getElementById("tituloKpiRIS");
+
+if (regionSeleccionada === "") {
+  tituloRIS.textContent =
+    "RIS REGISTRADAS";
+} else {
+  tituloRIS.textContent =
+    "RIS REGISTRADAS (" +
+    regionSeleccionada +
+    ")";
+}
 
 // Avance nacional
 const avanceNacional = calcularAvanceNacional();
